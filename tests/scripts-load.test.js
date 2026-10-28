@@ -5,7 +5,7 @@ const { loadScript } = require("./helpers/loadScript.js");
 // The pure scripts are shared by the shell and the tests; this guards
 // against a script that only loads inside Quickshell.
 const scripts = [
-  ["Corpus.js", ["wordList", "punctuationChars", "sentences"]],
+  ["Corpus.js", ["wordList"]],
   ["Curriculum.js", ["levels", "fingerLevels", "buildDrill", "fingerForKey"]],
   ["ProgressStore.js", ["defaultProgress", "parse", "toJsonText", "recordAttempt"]],
   ["I18n.js", ["languages", "t", "normalize"]]
@@ -19,3 +19,10 @@ for (const [file, expected] of scripts) {
     }
   });
 }
+
+test("Corpus.js exposes its data banks", () => {
+  const corpus = loadScript("Corpus.js");
+  assert.ok(Array.isArray(corpus.punctuationChars));
+  assert.ok(Array.isArray(corpus.sentences));
+  assert.ok(corpus.wordList("homeRow").length > 0);
+});
