@@ -32,6 +32,13 @@ Item {
   // language-neutral because they describe a physical QWERTY board.
   property string language: I18n.defaultLanguage()
 
+  // Font families for localized text. The theme font is listed first so the
+  // trainer keeps its theme identity, with a CJK-capable family behind it so
+  // Chinese text renders as glyphs rather than empty boxes.
+  readonly property var uiFonts: root.language === "zh-CN"
+    ? [Style.font.family, "Noto Sans CJK SC", "Noto Sans", "sans-serif"]
+    : [Style.font.family]
+
   // Resolves a catalog key for the active language. Callers inside bindings
   // read root.language, so changing the language refreshes them in place.
   function t(key, params) {
@@ -117,6 +124,11 @@ Item {
       if (entry && entry.passed) n++
     }
     return n
+  }
+
+  function toggleLanguage() {
+    root.language = I18n.nextLanguage(root.language)
+    root.saveProgress()
   }
 
   // ---- admin menu state -------------------------------------------------
@@ -466,6 +478,10 @@ Item {
                 if (9 < root.trackLevels(root.selectedTrack).length) root.selectedIndex = 9
                 event.accepted = true
               }
+              else if (event.text === "l" || event.text === "L") {
+                root.toggleLanguage()
+                event.accepted = true
+              }
             }
           }
 
@@ -482,9 +498,9 @@ Item {
                 id: titleText
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Touch Type"
+                text: I18n.t("app.title", root.language)
                 color: root.foreground
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.display
                 font.bold: true
               }
@@ -514,10 +530,10 @@ Item {
 
                 Text {
                   id: adminButtonText
-                  text: "⚙ Admin"
+                  text: I18n.t("app.admin", root.language)
                   anchors.centerIn: parent
                   color: root.foreground
-                  font.family: Style.font.family
+                  font.families: root.uiFonts
                   font.pixelSize: Style.font.bodySmall
                   font.bold: true
                 }
@@ -534,17 +550,60 @@ Item {
                 }
               }
 
+              Rectangle {
+                id: languageButton
+                height: Style.space(28)
+                width: languageButtonText.implicitWidth + Style.spacing.lg * 2
+                radius: height / 2
+                anchors.right: adminButton.left
+                anchors.rightMargin: Style.spacing.lg
+                anchors.verticalCenter: parent.verticalCenter
+                color: languageArea.containsMouse ? Util.alpha(Color.accent, 0.2) : Util.alpha(root.foreground, 0.05)
+                border.width: 1
+                border.color: Util.alpha(root.foreground, 0.12)
+
+                Text {
+                  id: languageButtonText
+                  text: "🌐 " + I18n.label(root.language)
+                  anchors.centerIn: parent
+                  color: root.foreground
+                  font.families: root.uiFonts
+                  font.pixelSize: Style.font.bodySmall
+                  font.bold: true
+                }
+
+                MouseArea {
+                  id: languageArea
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onClicked: root.toggleLanguage()
+                }
+
+                Text {
+                  anchors.top: languageButton.bottom
+                  anchors.topMargin: Style.spacing.xs
+                  anchors.horizontalCenter: parent.horizontalCenter
+                  visible: languageArea.containsMouse
+                  text: I18n.t("app.language.tooltip", root.language)
+                  color: Color.muted
+                  font.families: root.uiFonts
+                  font.pixelSize: Style.font.caption
+                  z: 5
+                }
+              }
+
               Row {
                 id: streakBadge
                 spacing: Style.spacing.xs
-                anchors.right: adminButton.left
+                anchors.right: languageButton.left
                 anchors.rightMargin: Style.spacing.lg
                 anchors.verticalCenter: parent.verticalCenter
                 Text { text: "🔥"; font.pixelSize: Style.font.heading }
                 Text {
-                  text: (root.progress.streak.count || 0) + " day streak"
+                  text: I18n.t("app.streak", root.language, { n: root.progress.streak.count || 0 })
                   color: root.foreground
-                  font.family: Style.font.family
+                  font.families: root.uiFonts
                   font.pixelSize: Style.font.body
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -554,7 +613,7 @@ Item {
             Text {
               text: "Train each finger pair, or run the classic course. Use ←/→ to switch tracks, ↑↓ + Enter, number keys, or click."
               color: Color.muted
-              font.family: Style.font.family
+              font.families: root.uiFonts
               font.pixelSize: Style.font.bodySmall
             }
 
@@ -586,7 +645,7 @@ Item {
                     anchors.centerIn: parent
                     text: modelData.label + "  " + modelData.count + "/" + modelData.total
                     color: isActive ? Color.accent : root.foreground
-                    font.family: Style.font.family
+                    font.families: root.uiFonts
                     font.pixelSize: Style.font.body
                     font.bold: isActive
                   }
@@ -645,7 +704,7 @@ Item {
                       anchors.verticalCenter: parent.verticalCenter
                       text: levelRow.isUnlocked ? String(levelRow.index + 1) : "🔒"
                       color: levelRow.finger !== "" ? levelRow.fingerColor : (levelRow.entry.passed ? Color.accent : root.foreground)
-                      font.family: Style.font.family
+                      font.families: root.uiFonts
                       font.pixelSize: Style.font.heading
                       horizontalAlignment: Text.AlignHCenter
                     }
@@ -656,7 +715,7 @@ Item {
                       Text {
                         text: (levelRow.entry.passed ? "✓ " : "") + I18n.t(levelRow.modelData.titleKey, root.language)
                         color: root.foreground
-                        font.family: Style.font.family
+                        font.families: root.uiFonts
                         font.pixelSize: Style.font.body
                         font.bold: true
                       }
@@ -676,7 +735,7 @@ Item {
                         visible: levelRow.entry.attempts > 0
                         text: "Best: " + levelRow.entry.bestWpm + " wpm · " + levelRow.entry.bestAccuracy + "%"
                         color: Color.muted
-                        font.family: Style.font.family
+                        font.families: root.uiFonts
                         font.pixelSize: Style.font.caption
                         horizontalAlignment: Text.AlignRight
                         anchors.right: parent.right
@@ -753,7 +812,7 @@ Item {
                         text: modelData.label
                         color: isDanger && (isSelected || isHovered) ? Color.urgent
                           : ((isSelected || isHovered) ? Color.accent : root.foreground)
-                        font.family: Style.font.family
+                        font.families: root.uiFonts
                         font.pixelSize: Style.font.body
                         font.bold: isSelected || isHovered
                       }
@@ -809,7 +868,7 @@ Item {
                 anchors.left: parent.left
                 text: root.currentLevel ? ((root.currentTrack === "finger" ? "🖐 " : "") + (root.currentLevelIndex + 1) + ". " + I18n.t(root.currentLevel.titleKey, root.language)) : ""
                 color: root.foreground
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.heading
                 font.bold: true
               }
@@ -818,7 +877,7 @@ Item {
                 anchors.verticalCenter: lessonTitle.verticalCenter
                 text: "Esc: menu"
                 color: Color.muted
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.caption
               }
             }
@@ -902,7 +961,7 @@ Item {
                 visible: root.currentFinger !== ""
                 text: root.currentFingerLabel + " — press the tinted keys"
                 color: root.currentFingerColor
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.bodySmall
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -912,7 +971,7 @@ Item {
                 visible: root.currentFinger === ""
                 text: "Keys tinted by finger:"
                 color: Color.muted
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.bodySmall
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -936,7 +995,7 @@ Item {
                   Text {
                     text: modelData.abbr
                     color: Color.muted
-                    font.family: Style.font.family
+                    font.families: root.uiFonts
                     font.pixelSize: Style.font.caption
                     anchors.verticalCenter: parent.verticalCenter
                   }
@@ -981,7 +1040,7 @@ Item {
               anchors.horizontalCenter: parent.horizontalCenter
               text: root.lastResult && root.lastResult.passed ? "✓ Level passed!" : "Keep practicing"
               color: root.lastResult && root.lastResult.passed ? Color.accent : root.foreground
-              font.family: Style.font.family
+              font.families: root.uiFonts
               font.pixelSize: Style.font.displayLarge
               font.bold: true
             }
@@ -993,17 +1052,17 @@ Item {
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.accuracy + "%" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "accuracy"; color: Color.muted; font.family: Style.font.family; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: "accuracy"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.wpm : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "wpm"; color: Color.muted; font.family: Style.font.family; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: "wpm"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? Math.round(root.lastResult.timeMs / 1000) + "s" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "time"; color: Color.muted; font.family: Style.font.family; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: "time"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
             }
 
@@ -1017,7 +1076,7 @@ Item {
               Text {
                 text: "Weakest keys"
                 color: root.foreground
-                font.family: Style.font.family
+                font.families: root.uiFonts
                 font.pixelSize: Style.font.body
                 font.bold: true
               }
@@ -1066,7 +1125,7 @@ Item {
               anchors.horizontalCenter: parent.horizontalCenter
               text: "Enter: retry" + (root.nextLevelAvailable() ? "   ·   N: next level" : "") + "   ·   Esc: menu"
               color: Color.muted
-              font.family: Style.font.family
+              font.families: root.uiFonts
               font.pixelSize: Style.font.caption
             }
           }
