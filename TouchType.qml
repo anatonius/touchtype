@@ -7,6 +7,7 @@ import qs.Ui
 import "Curriculum.js" as Curriculum
 import "Corpus.js" as Corpus
 import "ProgressStore.js" as Progress
+import "I18n.js" as I18n
 
 // Touch Type — guided touch-typing trainer overlay.
 //
@@ -24,6 +25,26 @@ Item {
 
   property bool opened: false
   property string screen: "menu"   // "menu" | "lesson" | "results"
+
+  // ---- language --------------------------------------------------------
+  // The active locale. Displayed strings are resolved through the
+  // localization catalog; the drill text and the on-screen keyboard stay
+  // language-neutral because they describe a physical QWERTY board.
+  property string language: I18n.defaultLanguage()
+
+  // Resolves a catalog key for the active language. Callers inside bindings
+  // read root.language, so changing the language refreshes them in place.
+  function t(key, params) {
+    return I18n.t(key, root.language, params)
+  }
+
+  // The description shown under a level title: prose when the level has a
+  // translated description, otherwise the language-neutral key hint.
+  function levelDescription(level) {
+    if (!level) return ""
+    if (level.subtitleKey) return I18n.t(level.subtitleKey, root.language)
+    return level.keysHint || ""
+  }
 
   // ---- theme surface -------------------------------------------------
   property color background: Color.popups.background
@@ -148,7 +169,7 @@ Item {
   property var lastResult: null
 
   readonly property var currentLevel: root.currentLevelIndex >= 0 ? root.trackLevels(root.currentTrack)[root.currentLevelIndex] : null
-  readonly property string currentFingerLabel: root.currentFinger !== "" && Curriculum.fingerMeta[root.currentFinger] ? Curriculum.fingerMeta[root.currentFinger].label : ""
+  readonly property string currentFingerLabel: root.currentFinger !== "" && Curriculum.fingerMeta[root.currentFinger] ? I18n.t(Curriculum.fingerMeta[root.currentFinger].labelKey, root.language) : ""
   readonly property color currentFingerColor: root.currentFinger !== "" && Curriculum.fingerMeta[root.currentFinger] ? Curriculum.fingerMeta[root.currentFinger].color : Color.accent
 
   function open(payloadJson) {
@@ -621,14 +642,14 @@ Item {
                       width: parent.width - Style.space(28) - statsCol.width - Style.spacing.md * 2
                       anchors.verticalCenter: parent.verticalCenter
                       Text {
-                        text: (levelRow.entry.passed ? "✓ " : "") + levelRow.modelData.title
+                        text: (levelRow.entry.passed ? "✓ " : "") + I18n.t(levelRow.modelData.titleKey, root.language)
                         color: root.foreground
                         font.family: Style.font.family
                         font.pixelSize: Style.font.body
                         font.bold: true
                       }
                       Text {
-                        text: levelRow.modelData.subtitle
+                        text: root.levelDescription(levelRow.modelData)
                         color: Color.muted
                         font.family: root.monoFont
                         font.pixelSize: Style.font.bodySmall
@@ -774,7 +795,7 @@ Item {
               Text {
                 id: lessonTitle
                 anchors.left: parent.left
-                text: root.currentLevel ? ((root.currentTrack === "finger" ? "🖐 " : "") + (root.currentLevelIndex + 1) + ". " + root.currentLevel.title) : ""
+                text: root.currentLevel ? ((root.currentTrack === "finger" ? "🖐 " : "") + (root.currentLevelIndex + 1) + ". " + I18n.t(root.currentLevel.titleKey, root.language)) : ""
                 color: root.foreground
                 font.family: Style.font.family
                 font.pixelSize: Style.font.heading

@@ -8,7 +8,11 @@
 
 // Each level:
 //   id            stable identifier, used as the progress-store key
-//   title/subtitle shown in the level-select screen
+//   titleKey      catalog key for the level title shown in the level-select
+//                 screen (language-neutral; resolved by the caller)
+//   subtitleKey   catalog key for a prose description, when the level has one
+//   keysHint      language-neutral description of the keys a level drills,
+//                 used when the level has no prose description
 //   mode          "chars" | "words" | "mixed" | "sentences"
 //   keys          (chars mode) key set to drill
 //   wordList      (words/mixed mode) which corpus bucket name to draw from
@@ -19,55 +23,55 @@
 function levels(punctuationChars) {
   return [
     {
-      id: "anchors", title: "F & J Anchors", subtitle: "Find home by feel",
+      id: "anchors", titleKey: "level.anchors.title", subtitleKey: "level.anchors.subtitle",
       mode: "chars", keys: ["f", "j"], length: 60,
       passAccuracy: 90, passWpm: 0
     },
     {
-      id: "homerow", title: "Home Row", subtitle: "A S D F G H J K L ;",
+      id: "homerow", titleKey: "level.homerow.title", keysHint: "A S D F G H J K L ;",
       mode: "chars", keys: ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"], length: 90,
       passAccuracy: 90, passWpm: 0
     },
     {
-      id: "homerow-words", title: "Home Row Words", subtitle: "Real words, home keys only",
+      id: "homerow-words", titleKey: "level.homerowWords.title", subtitleKey: "level.homerowWords.subtitle",
       mode: "words", wordList: "homeRow", count: 18,
       passAccuracy: 90, passWpm: 10
     },
     {
-      id: "toprow", title: "Top Row", subtitle: "Q W E R T   Y U I O P",
+      id: "toprow", titleKey: "level.toprow.title", keysHint: "Q W E R T   Y U I O P",
       mode: "chars",
       keys: ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "j", "k", "l", ";"],
       length: 100, passAccuracy: 88, passWpm: 0
     },
     {
-      id: "toprow-words", title: "Top Row Words", subtitle: "Words without the bottom row",
+      id: "toprow-words", titleKey: "level.toprowWords.title", subtitleKey: "level.toprowWords.subtitle",
       mode: "words", wordList: "topRow", count: 20,
       passAccuracy: 88, passWpm: 12
     },
     {
-      id: "bottomrow", title: "Bottom Row", subtitle: "Z X C V B   N M , . /",
+      id: "bottomrow", titleKey: "level.bottomrow.title", keysHint: "Z X C V B   N M , . /",
       mode: "chars",
       keys: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
         "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", ",", ".", "/"],
       length: 110, passAccuracy: 85, passWpm: 0
     },
     {
-      id: "fullalphabet", title: "Full Alphabet", subtitle: "Every letter, real words",
+      id: "fullalphabet", titleKey: "level.fullAlphabet.title", subtitleKey: "level.fullAlphabet.subtitle",
       mode: "words", wordList: "common", count: 22,
       passAccuracy: 88, passWpm: 15
     },
     {
-      id: "numbers", title: "Numbers & Punctuation", subtitle: "0-9 and basic symbols",
+      id: "numbers", titleKey: "level.numbers.title", subtitleKey: "level.numbers.subtitle",
       mode: "chars", keys: punctuationChars || [",", ".", ";", "'", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
       length: 90, passAccuracy: 85, passWpm: 0
     },
     {
-      id: "mixed", title: "Mixed Drills", subtitle: "Capitals, numbers, punctuation",
+      id: "mixed", titleKey: "level.mixed.title", subtitleKey: "level.mixed.subtitle",
       mode: "mixed", wordList: "common", count: 20,
       passAccuracy: 85, passWpm: 15
     },
     {
-      id: "sentences", title: "Sentences & Speed", subtitle: "Full sentences, timed",
+      id: "sentences", titleKey: "level.sentences.title", subtitleKey: "level.sentences.subtitle",
       mode: "sentences", count: 4,
       passAccuracy: 90, passWpm: 20
     }
@@ -86,11 +90,12 @@ var fingerKeys = {
 // Fixed pedagogical palette — one hue per finger pair so learners can
 // associate colors with fingers. Kept readable on both dark and light
 // themes by applying them at low alpha for zones and full for highlights.
+// The label is a catalog key so the finger's name can be translated.
 var fingerMeta = {
-  index: { id: "index", label: "Index fingers", color: "#4fa3e3" },
-  middle: { id: "middle", label: "Middle fingers", color: "#5fc184" },
-  ring: { id: "ring", label: "Ring fingers", color: "#e5a35c" },
-  pinky: { id: "pinky", label: "Pinky fingers", color: "#d67ab1" }
+  index: { id: "index", labelKey: "finger.index", color: "#4fa3e3" },
+  middle: { id: "middle", labelKey: "finger.middle", color: "#5fc184" },
+  ring: { id: "ring", labelKey: "finger.ring", color: "#e5a35c" },
+  pinky: { id: "pinky", labelKey: "finger.pinky", color: "#d67ab1" }
 }
 
 var numberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -106,37 +111,37 @@ function fingerLevels() {
   return [
     {
       id: "finger-index", track: "finger", finger: "index",
-      title: "Index Fingers", subtitle: "R F V T G B · Y U H J N M",
+      titleKey: "level.fingerIndex.title", keysHint: "R F V T G B · Y U H J N M",
       mode: "chars", keys: fingerKeys.index, length: 80,
       passAccuracy: 90, passWpm: 0
     },
     {
       id: "finger-middle", track: "finger", finger: "middle",
-      title: "Middle Fingers", subtitle: "E D C · I K ,",
+      titleKey: "level.fingerMiddle.title", keysHint: "E D C · I K ,",
       mode: "chars", keys: fingerKeys.middle, length: 70,
       passAccuracy: 90, passWpm: 0
     },
     {
       id: "finger-ring", track: "finger", finger: "ring",
-      title: "Ring Fingers", subtitle: "W S X · O L .",
+      titleKey: "level.fingerRing.title", keysHint: "W S X · O L .",
       mode: "chars", keys: fingerKeys.ring, length: 70,
       passAccuracy: 90, passWpm: 0
     },
     {
       id: "finger-pinky", track: "finger", finger: "pinky",
-      title: "Pinky Fingers", subtitle: "Q A Z · P ; / '",
+      titleKey: "level.fingerPinky.title", keysHint: "Q A Z · P ; / '",
       mode: "chars", keys: fingerKeys.pinky, length: 70,
       passAccuracy: 90, passWpm: 0
     },
     {
       id: "finger-numbers", track: "finger", finger: "",
-      title: "Numbers Row", subtitle: "1–0 across all fingers",
+      titleKey: "level.fingerNumbers.title", subtitleKey: "level.fingerNumbers.subtitle",
       mode: "chars", keys: numberKeys, length: 90,
       passAccuracy: 85, passWpm: 0
     },
     {
       id: "finger-punct", track: "finger", finger: "",
-      title: "Punctuation", subtitle: ", . ; ' / - = [ ] ! ? :",
+      titleKey: "level.fingerPunct.title", keysHint: ", . ; ' / - = [ ] ! ? :",
       mode: "chars", keys: punctuationKeys, length: 90,
       passAccuracy: 85, passWpm: 0
     }
