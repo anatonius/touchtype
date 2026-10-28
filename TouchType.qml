@@ -139,8 +139,8 @@ Item {
   readonly property var adminActions: {
     root.progress.unlockAll // reactive: label follows the persisted unlock-all flag
     return [
-      { id: "unlock", label: root.progress.unlockAll ? "Lock all stages" : "Open all stages" },
-      { id: "reset", label: "Reset progress", danger: true }
+      { id: "unlock", label: I18n.t(root.progress.unlockAll ? "admin.lock" : "admin.unlock", root.language) },
+      { id: "reset", label: I18n.t("admin.reset", root.language), danger: true }
     ]
   }
 
@@ -611,7 +611,7 @@ Item {
             }
 
             Text {
-              text: "Train each finger pair, or run the classic course. Use ←/→ to switch tracks, ↑↓ + Enter, number keys, or click."
+              text: I18n.t("menu.hint", root.language)
               color: Color.muted
               font.families: root.uiFonts
               font.pixelSize: Style.font.bodySmall
@@ -625,8 +625,8 @@ Item {
 
               Repeater {
                 model: [
-                  { track: "finger", label: "🖐 Finger Gym", count: root.passedCount("finger"), total: root.fingerList.length },
-                  { track: "classic", label: "⌨ Classic Course", count: root.passedCount("classic"), total: root.levelList.length }
+                  { track: "finger", label: I18n.t("menu.track.finger", root.language), count: root.passedCount("finger"), total: root.fingerList.length },
+                  { track: "classic", label: I18n.t("menu.track.classic", root.language), count: root.passedCount("classic"), total: root.levelList.length }
                 ]
 
                 Rectangle {
@@ -733,7 +733,7 @@ Item {
                       width: Style.space(140)
                       Text {
                         visible: levelRow.entry.attempts > 0
-                        text: "Best: " + levelRow.entry.bestWpm + " wpm · " + levelRow.entry.bestAccuracy + "%"
+                        text: I18n.t("menu.level.best", root.language, { wpm: levelRow.entry.bestWpm, acc: levelRow.entry.bestAccuracy })
                         color: Color.muted
                         font.families: root.uiFonts
                         font.pixelSize: Style.font.caption
@@ -875,7 +875,7 @@ Item {
               Text {
                 anchors.right: parent.right
                 anchors.verticalCenter: lessonTitle.verticalCenter
-                text: "Esc: menu"
+                text: I18n.t("lesson.hint", root.language)
                 color: Color.muted
                 font.families: root.uiFonts
                 font.pixelSize: Style.font.caption
@@ -887,19 +887,19 @@ Item {
               spacing: Style.spacing.xxl
 
               Text {
-                text: "⏱ " + (Math.floor(root.elapsedMs / 1000)) + "s"
+                text: I18n.t("lesson.time", root.language, { s: Math.floor(root.elapsedMs / 1000) })
                 color: Color.muted
                 font.family: root.monoFont
                 font.pixelSize: Style.font.body
               }
               Text {
-                text: "⌨ " + root.liveWpm + " wpm"
+                text: I18n.t("lesson.wpm", root.language, { wpm: root.liveWpm })
                 color: Color.muted
                 font.family: root.monoFont
                 font.pixelSize: Style.font.body
               }
               Text {
-                text: "🎯 " + root.liveAccuracy + "%"
+                text: I18n.t("lesson.accuracy", root.language, { acc: root.liveAccuracy })
                 color: root.currentLevel && root.liveAccuracy >= root.currentLevel.passAccuracy ? Color.accent : Color.urgent
                 font.family: root.monoFont
                 font.pixelSize: Style.font.body
@@ -959,7 +959,7 @@ Item {
               }
               Text {
                 visible: root.currentFinger !== ""
-                text: root.currentFingerLabel + " — press the tinted keys"
+                text: I18n.t("lesson.finger.hint", root.language, { fingers: root.currentFingerLabel })
                 color: root.currentFingerColor
                 font.families: root.uiFonts
                 font.pixelSize: Style.font.bodySmall
@@ -969,7 +969,7 @@ Item {
 
               Text {
                 visible: root.currentFinger === ""
-                text: "Keys tinted by finger:"
+                text: I18n.t("lesson.finger.legend", root.language)
                 color: Color.muted
                 font.families: root.uiFonts
                 font.pixelSize: Style.font.bodySmall
@@ -1038,7 +1038,7 @@ Item {
 
             Text {
               anchors.horizontalCenter: parent.horizontalCenter
-              text: root.lastResult && root.lastResult.passed ? "✓ Level passed!" : "Keep practicing"
+              text: root.lastResult && root.lastResult.passed ? I18n.t("results.passed", root.language) : I18n.t("results.keepPracticing", root.language)
               color: root.lastResult && root.lastResult.passed ? Color.accent : root.foreground
               font.families: root.uiFonts
               font.pixelSize: Style.font.displayLarge
@@ -1052,17 +1052,17 @@ Item {
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.accuracy + "%" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "accuracy"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.accuracy", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.wpm : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "wpm"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.wpm", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? Math.round(root.lastResult.timeMs / 1000) + "s" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: "time"; color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.time", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
             }
 
@@ -1074,7 +1074,7 @@ Item {
               visible: weakKeysRepeater.count > 0
 
               Text {
-                text: "Weakest keys"
+                text: I18n.t("results.weakestKeys", root.language)
                 color: root.foreground
                 font.families: root.uiFonts
                 font.pixelSize: Style.font.body
@@ -1123,7 +1123,7 @@ Item {
 
             Text {
               anchors.horizontalCenter: parent.horizontalCenter
-              text: "Enter: retry" + (root.nextLevelAvailable() ? "   ·   N: next level" : "") + "   ·   Esc: menu"
+              text: I18n.t("results.hint", root.language, { next: root.nextLevelAvailable() ? I18n.t("results.hint.next", root.language) : "" })
               color: Color.muted
               font.families: root.uiFonts
               font.pixelSize: Style.font.caption
@@ -1137,9 +1137,9 @@ Item {
         anchors.fill: parent
         opened: root.resetConfirmOpen
         z: 50
-        message: "Reset all progress? Streaks, best scores, and weak-key stats will be cleared."
-        cancelText: "Cancel"
-        confirmText: "Reset"
+        message: I18n.t("admin.confirm.message", root.language)
+        cancelText: I18n.t("admin.confirm.cancel", root.language)
+        confirmText: I18n.t("admin.confirm.reset", root.language)
         background: root.background
         foreground: root.foreground
         scrim: root.scrim

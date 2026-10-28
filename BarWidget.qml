@@ -5,6 +5,7 @@ import qs.Commons
 import qs.Ui
 import "ProgressStore.js" as Progress
 import "Curriculum.js" as Curriculum
+import "I18n.js" as I18n
 
 // Compact bar indicator: keyboard icon plus daily streak.
 // Hover shows per-track progress; click opens the Touch Type overlay.
@@ -29,6 +30,9 @@ BarWidget {
   readonly property int classicPassed: root.countPassed(root.levelList)
   readonly property int streakCount: root.progress.streak.count || 0
   readonly property string displayText: "⌨" + (root.streakCount > 0 ? "  🔥" + root.streakCount : "")
+  // The widget follows the same saved preference as the overlay, so the
+  // tooltip never disagrees with the trainer it opens.
+  readonly property string language: I18n.normalize(root.progress.settings.language)
 
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
@@ -48,7 +52,11 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     text: root.vertical ? "⌨" : root.displayText
-    tooltipText: "Touch Type — Finger Gym " + (root.fingerPassed + 1) + "/" + root.fingerList.length + ", Classic " + (root.classicPassed + 1) + "/" + root.levelList.length + ", " + root.streakCount + " day streak"
+    tooltipText: I18n.t("bar.tooltip", root.language, {
+      fp: root.fingerPassed + 1, ft: root.fingerList.length,
+      cp: root.classicPassed + 1, ct: root.levelList.length,
+      streak: root.streakCount
+    })
     horizontalMargin: 8.5
 
     onPressed: function(b) {
