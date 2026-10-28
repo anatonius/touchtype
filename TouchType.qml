@@ -32,12 +32,13 @@ Item {
   // language-neutral because they describe a physical QWERTY board.
   property string language: I18n.defaultLanguage()
 
-  // Font families for localized text. The theme font is listed first so the
-  // trainer keeps its theme identity, with a CJK-capable family behind it so
-  // Chinese text renders as glyphs rather than empty boxes.
-  readonly property var uiFonts: root.language === "zh-CN"
-    ? [Style.font.family, "Noto Sans CJK SC", "Noto Sans", "sans-serif"]
-    : [Style.font.family]
+  // Font for localized text. Theme fonts rarely carry Chinese glyphs, so the
+  // Chinese locale resolves a CJK-capable family instead of rendering
+  // empty boxes. The family also carries Latin glyphs, so mixed text stays
+  // coherent.
+  readonly property string uiFont: root.language === "zh-CN"
+    ? "Noto Sans CJK SC"
+    : Style.font.family
 
   // Resolves a catalog key for the active language. Callers inside bindings
   // read root.language, so changing the language refreshes them in place.
@@ -500,7 +501,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: I18n.t("app.title", root.language)
                 color: root.foreground
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.display
                 font.bold: true
               }
@@ -533,7 +534,7 @@ Item {
                   text: I18n.t("app.admin", root.language)
                   anchors.centerIn: parent
                   color: root.foreground
-                  font.families: root.uiFonts
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.bodySmall
                   font.bold: true
                 }
@@ -567,7 +568,7 @@ Item {
                   text: "🌐 " + I18n.label(root.language)
                   anchors.centerIn: parent
                   color: root.foreground
-                  font.families: root.uiFonts
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.bodySmall
                   font.bold: true
                 }
@@ -587,7 +588,7 @@ Item {
                   visible: languageArea.containsMouse
                   text: I18n.t("app.language.tooltip", root.language)
                   color: Color.muted
-                  font.families: root.uiFonts
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.caption
                   z: 5
                 }
@@ -603,7 +604,7 @@ Item {
                 Text {
                   text: I18n.t("app.streak", root.language, { n: root.progress.streak.count || 0 })
                   color: root.foreground
-                  font.families: root.uiFonts
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.body
                   anchors.verticalCenter: parent.verticalCenter
                 }
@@ -613,7 +614,7 @@ Item {
             Text {
               text: I18n.t("menu.hint", root.language)
               color: Color.muted
-              font.families: root.uiFonts
+              font.family: root.uiFont
               font.pixelSize: Style.font.bodySmall
             }
 
@@ -645,7 +646,7 @@ Item {
                     anchors.centerIn: parent
                     text: modelData.label + "  " + modelData.count + "/" + modelData.total
                     color: isActive ? Color.accent : root.foreground
-                    font.families: root.uiFonts
+                    font.family: root.uiFont
                     font.pixelSize: Style.font.body
                     font.bold: isActive
                   }
@@ -704,7 +705,7 @@ Item {
                       anchors.verticalCenter: parent.verticalCenter
                       text: levelRow.isUnlocked ? String(levelRow.index + 1) : "🔒"
                       color: levelRow.finger !== "" ? levelRow.fingerColor : (levelRow.entry.passed ? Color.accent : root.foreground)
-                      font.families: root.uiFonts
+                      font.family: root.uiFont
                       font.pixelSize: Style.font.heading
                       horizontalAlignment: Text.AlignHCenter
                     }
@@ -715,7 +716,7 @@ Item {
                       Text {
                         text: (levelRow.entry.passed ? "✓ " : "") + I18n.t(levelRow.modelData.titleKey, root.language)
                         color: root.foreground
-                        font.families: root.uiFonts
+                        font.family: root.uiFont
                         font.pixelSize: Style.font.body
                         font.bold: true
                       }
@@ -735,7 +736,7 @@ Item {
                         visible: levelRow.entry.attempts > 0
                         text: I18n.t("menu.level.best", root.language, { wpm: levelRow.entry.bestWpm, acc: levelRow.entry.bestAccuracy })
                         color: Color.muted
-                        font.families: root.uiFonts
+                        font.family: root.uiFont
                         font.pixelSize: Style.font.caption
                         horizontalAlignment: Text.AlignRight
                         anchors.right: parent.right
@@ -812,7 +813,7 @@ Item {
                         text: modelData.label
                         color: isDanger && (isSelected || isHovered) ? Color.urgent
                           : ((isSelected || isHovered) ? Color.accent : root.foreground)
-                        font.families: root.uiFonts
+                        font.family: root.uiFont
                         font.pixelSize: Style.font.body
                         font.bold: isSelected || isHovered
                       }
@@ -868,7 +869,7 @@ Item {
                 anchors.left: parent.left
                 text: root.currentLevel ? ((root.currentTrack === "finger" ? "🖐 " : "") + (root.currentLevelIndex + 1) + ". " + I18n.t(root.currentLevel.titleKey, root.language)) : ""
                 color: root.foreground
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.heading
                 font.bold: true
               }
@@ -877,7 +878,7 @@ Item {
                 anchors.verticalCenter: lessonTitle.verticalCenter
                 text: I18n.t("lesson.hint", root.language)
                 color: Color.muted
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.caption
               }
             }
@@ -961,7 +962,7 @@ Item {
                 visible: root.currentFinger !== ""
                 text: I18n.t("lesson.finger.hint", root.language, { fingers: root.currentFingerLabel })
                 color: root.currentFingerColor
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.bodySmall
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -971,7 +972,7 @@ Item {
                 visible: root.currentFinger === ""
                 text: I18n.t("lesson.finger.legend", root.language)
                 color: Color.muted
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.bodySmall
                 anchors.verticalCenter: parent.verticalCenter
               }
@@ -995,7 +996,7 @@ Item {
                   Text {
                     text: modelData.abbr
                     color: Color.muted
-                    font.families: root.uiFonts
+                    font.family: root.uiFont
                     font.pixelSize: Style.font.caption
                     anchors.verticalCenter: parent.verticalCenter
                   }
@@ -1040,7 +1041,7 @@ Item {
               anchors.horizontalCenter: parent.horizontalCenter
               text: root.lastResult && root.lastResult.passed ? I18n.t("results.passed", root.language) : I18n.t("results.keepPracticing", root.language)
               color: root.lastResult && root.lastResult.passed ? Color.accent : root.foreground
-              font.families: root.uiFonts
+              font.family: root.uiFont
               font.pixelSize: Style.font.displayLarge
               font.bold: true
             }
@@ -1052,17 +1053,17 @@ Item {
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.accuracy + "%" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: I18n.t("results.accuracy", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.accuracy", root.language); color: Color.muted; font.family: root.uiFont; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? root.lastResult.wpm : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: I18n.t("results.wpm", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.wpm", root.language); color: Color.muted; font.family: root.uiFont; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
               Column {
                 spacing: Style.spacing.xs
                 Text { text: root.lastResult ? Math.round(root.lastResult.timeMs / 1000) + "s" : ""; color: root.foreground; font.family: root.monoFont; font.pixelSize: Style.font.display; anchors.horizontalCenter: parent.horizontalCenter }
-                Text { text: I18n.t("results.time", root.language); color: Color.muted; font.families: root.uiFonts; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
+                Text { text: I18n.t("results.time", root.language); color: Color.muted; font.family: root.uiFont; font.pixelSize: Style.font.caption; anchors.horizontalCenter: parent.horizontalCenter }
               }
             }
 
@@ -1076,7 +1077,7 @@ Item {
               Text {
                 text: I18n.t("results.weakestKeys", root.language)
                 color: root.foreground
-                font.families: root.uiFonts
+                font.family: root.uiFont
                 font.pixelSize: Style.font.body
                 font.bold: true
               }
@@ -1125,7 +1126,7 @@ Item {
               anchors.horizontalCenter: parent.horizontalCenter
               text: I18n.t("results.hint", root.language, { next: root.nextLevelAvailable() ? I18n.t("results.hint.next", root.language) : "" })
               color: Color.muted
-              font.families: root.uiFonts
+              font.family: root.uiFont
               font.pixelSize: Style.font.caption
             }
           }

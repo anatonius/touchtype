@@ -16,6 +16,10 @@ whatever Omarchy theme you have active.
   track unlocks independently.
 - 10 progressive classic levels: home row → top row → bottom row → full alphabet →
   numbers/punctuation → mixed drills → timed sentences.
+- Language switch: English and Simplified Chinese, changeable at any time from
+  the trainer header and remembered between sessions. The switch translates the
+  instructions and level descriptions — the drills and the on-screen keyboard
+  stay Latin, because the subject is a physical QWERTY board.
 - Levels unlock as you pass the one before them (accuracy threshold per level).
 - Live on-screen keyboard that highlights the next expected key (with
   shift-key hinting) and marks the F/J home-row bumps. Finger Gym levels
@@ -70,6 +74,9 @@ The file hot-reloads on save — no restart needed.
   `Trigger → Touch Type → Open trainer`.
 - Navigate levels with `↑`/`↓` + `Enter`, number keys, or mouse click.
   Switch tracks with `←`/`→` (or `Tab`), or by clicking the track tabs.
+- `L` switches the interface language between English and Simplified Chinese.
+  The 🌐 button in the header does the same thing with the mouse. Your choice
+  is remembered.
 - `Esc` returns to the previous screen / closes the overlay.
 - Progress is stored at `~/.local/state/omarchy/touchtype-progress.json`.
   Reset anytime by deleting that file, or via the optional menu's
@@ -105,6 +112,7 @@ rm -f ~/.local/state/omarchy/touchtype-progress.json
 | `Corpus.js` | Word/sentence/punctuation data banks. |
 | `Curriculum.js` | 10-level classic curriculum + 6-level Finger Gym definitions, finger key maps, drill-text generators. |
 | `ProgressStore.js` | Progress persistence, accuracy/WPM/streak calculators. |
+| `I18n.js` | Translation catalog (English + Simplified Chinese) and key resolution. |
 
 ## License
 
@@ -112,9 +120,14 @@ MIT — see [LICENSE](LICENSE).
 
 ## Development notes
 
+- Run the test suite with `npm test` (Node's built-in test runner, no
+  dependencies). The tests load the plugin's pure JavaScript modules outside
+  Quickshell and cover the localization catalog, the curriculum's key
+  definitions, and the progress store.
 - Validated with `qmllint` (only the standard false-positive categories that
   also appear in Omarchy's own first-party plugins, due to the dynamic
   `qs.Commons`/`qs.Ui` import namespace not being statically resolvable).
 - Live-tested against a running `quickshell -p /usr/share/omarchy/shell`
   instance: overlay open/close, full lesson completion, level unlocking,
-  bar-widget live update, and menu actions all confirmed working.
+  bar-widget live update, menu actions and the language switch (including
+  Chinese rendering) all confirmed working.
