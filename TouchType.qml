@@ -85,6 +85,12 @@ Item {
   })
 
   function saveProgress() {
+    // The language preference lives with the rest of the learner's state, so
+    // the bar widget and the overlay always read the same value.
+    var next = JSON.parse(JSON.stringify(root.progress))
+    next.settings = next.settings || {}
+    next.settings.language = root.language
+    root.progress = next
     progressFile.setText(Progress.toJsonText(root.progress))
   }
 
@@ -135,7 +141,7 @@ Item {
   }
 
   function resetProgress() {
-    root.progress = Progress.defaultProgress()
+    root.progress = Progress.resetProgress(root.progress)
     root.saveProgress()
     root.resetConfirmOpen = false
     root.adminOpen = false
@@ -369,8 +375,14 @@ Item {
     watchChanges: false
     atomicWrites: true
     printErrors: false
-    onLoaded: root.progress = Progress.parse(text())
-    onLoadFailed: root.progress = Progress.defaultProgress()
+    onLoaded: {
+      root.progress = Progress.parse(text())
+      root.language = I18n.normalize(root.progress.settings.language)
+    }
+    onLoadFailed: {
+      root.progress = Progress.defaultProgress()
+      root.language = I18n.defaultLanguage()
+    }
   }
 
   PanelWindow {

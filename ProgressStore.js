@@ -10,6 +10,11 @@ function defaultProgress() {
     keyStats: {},
     streak: { count: 0, lastDay: "" },
     totals: { sessions: 0, timeMs: 0 },
+    // User preferences, kept apart from training data so that resetting
+    // progress can leave them alone. `language` holds a locale id; an empty
+    // value means "not chosen yet" and is resolved to a default by the
+    // caller, which keeps this script free of any locale list.
+    settings: { language: "" },
     unlockAll: false
   }
 }
@@ -46,6 +51,9 @@ function parse(raw) {
   if (data.totals && typeof data.totals === "object") {
     base.totals.sessions = Number(data.totals.sessions) || 0
     base.totals.timeMs = Number(data.totals.timeMs) || 0
+  }
+  if (data.settings && typeof data.settings === "object") {
+    if (typeof data.settings.language === "string") base.settings.language = data.settings.language
   }
   if (data.unlockAll !== undefined) base.unlockAll = !!data.unlockAll
   return base
@@ -112,6 +120,16 @@ function recordAttempt(progress, level, result) {
   }
 
   return { progress: next, passed: entry.passed, entry: entry }
+}
+
+// Clears training data — levels, key statistics, streak and totals — while
+// keeping the learner's preferences. Returns a NEW progress object.
+function resetProgress(progress) {
+  var next = defaultProgress()
+  if (progress && progress.settings && typeof progress.settings.language === "string") {
+    next.settings.language = progress.settings.language
+  }
+  return next
 }
 
 // Returns up to `limit` keys sorted by miss rate (highest first), skipping
