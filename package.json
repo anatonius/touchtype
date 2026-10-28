@@ -1,0 +1,10 @@
+{
+  "name": "touchtype",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Touch typing trainer plugin for the Omarchy shell (Quickshell).",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}
