@@ -34,17 +34,8 @@ Item {
 
   // Font for localized text. Theme fonts rarely carry Chinese glyphs, so the
   // Chinese locale resolves a CJK-capable family instead of rendering
-  // empty boxes. The family also carries Latin glyphs, so mixed text stays
-  // coherent.
-  readonly property string uiFont: root.language === "zh-CN"
-    ? "Noto Sans CJK SC"
-    : Style.font.family
-
-  // Resolves a catalog key for the active language. Callers inside bindings
-  // read root.language, so changing the language refreshes them in place.
-  function t(key, params) {
-    return I18n.t(key, root.language, params)
-  }
+  // empty boxes.
+  readonly property string uiFont: I18n.fontFamily(root.language, Style.font.family)
 
   // The description shown under a level title: prose when the level has a
   // translated description, otherwise the language-neutral key hint.
@@ -551,47 +542,14 @@ Item {
                 }
               }
 
-              Rectangle {
+              LanguageButton {
                 id: languageButton
-                height: Style.space(28)
-                width: languageButtonText.implicitWidth + Style.spacing.lg * 2
-                radius: height / 2
                 anchors.right: adminButton.left
                 anchors.rightMargin: Style.spacing.lg
                 anchors.verticalCenter: parent.verticalCenter
-                color: languageArea.containsMouse ? Util.alpha(Color.accent, 0.2) : Util.alpha(root.foreground, 0.05)
-                border.width: 1
-                border.color: Util.alpha(root.foreground, 0.12)
-
-                Text {
-                  id: languageButtonText
-                  text: "🌐 " + I18n.label(root.language)
-                  anchors.centerIn: parent
-                  color: root.foreground
-                  font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
-                  font.bold: true
-                }
-
-                MouseArea {
-                  id: languageArea
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: root.toggleLanguage()
-                }
-
-                Text {
-                  anchors.top: languageButton.bottom
-                  anchors.topMargin: Style.spacing.xs
-                  anchors.horizontalCenter: parent.horizontalCenter
-                  visible: languageArea.containsMouse
-                  text: I18n.t("app.language.tooltip", root.language)
-                  color: Color.muted
-                  font.family: root.uiFont
-                  font.pixelSize: Style.font.caption
-                  z: 5
-                }
+                language: root.language
+                foreground: root.foreground
+                onActivated: root.toggleLanguage()
               }
 
               Row {
@@ -873,8 +831,19 @@ Item {
                 font.pixelSize: Style.font.heading
                 font.bold: true
               }
-              Text {
+
+              LanguageButton {
+                id: lessonLanguageButton
                 anchors.right: parent.right
+                anchors.verticalCenter: lessonTitle.verticalCenter
+                language: root.language
+                foreground: root.foreground
+                onActivated: root.toggleLanguage()
+              }
+
+              Text {
+                anchors.right: lessonLanguageButton.left
+                anchors.rightMargin: Style.spacing.lg
                 anchors.verticalCenter: lessonTitle.verticalCenter
                 text: I18n.t("lesson.hint", root.language)
                 color: Color.muted

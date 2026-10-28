@@ -160,7 +160,6 @@ var catalogs = {
 function languages() {
   return locales
 }
-
 // The locale used when nothing else is known or chosen.
 function defaultLanguage() {
   return DEFAULT_LANGUAGE
@@ -199,6 +198,22 @@ function label(id) {
     if (locales[i].id === id) return locales[i].label
   }
   return ""
+}
+
+// Font families that cover each locale's glyphs. The theme font is used
+// where it covers the locale; Chinese needs a CJK-capable family, which
+// also carries Latin glyphs so mixed text stays coherent.
+var localeFonts = {
+  "en": "",
+  "zh-CN": "Noto Sans CJK SC"
+}
+
+// The font family to render a locale's text in. Falls back to the theme
+// font for any locale that does not need a specific one.
+function fontFamily(language, themeFont) {
+  var family = localeFonts[language]
+  if (family) return family
+  return themeFont || ""
 }
 
 // The catalog for a locale; an empty object for an unknown locale.

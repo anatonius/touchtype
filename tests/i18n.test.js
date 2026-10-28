@@ -101,3 +101,13 @@ test("keys returns every key defined by any catalog", () => {
   assert.ok(keys.includes("level.homerow.title"));
   assert.equal(new Set(keys).size, keys.length);
 });
+
+test("fontFamily picks a CJK-capable family for Chinese", () => {
+  assert.equal(i18n.fontFamily("zh-CN", "Inter"), "Noto Sans CJK SC");
+});
+
+test("fontFamily falls back to the theme font elsewhere", () => {
+  assert.equal(i18n.fontFamily("en", "Inter"), "Inter");
+  assert.equal(i18n.fontFamily("fr", "Inter"), "Inter");
+  assert.equal(i18n.fontFamily("en", ""), "");
+});
