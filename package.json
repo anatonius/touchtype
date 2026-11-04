@@ -5,6 +5,6 @@
   "description": "Touch typing trainer plugin for the Omarchy shell (Quickshell).",
   "license": "MIT",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test tests/*.test.js"
   }
 }
