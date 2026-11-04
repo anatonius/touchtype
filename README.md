@@ -31,7 +31,7 @@ whatever Omarchy theme you have active.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/toha82-tech/touchtype.git --enable
+omarchy plugin add https://github.com/anatonius/touchtype.git --enable
 ```
 
 That's it — this clones the plugin into `~/.config/omarchy/plugins/touchtype`,
@@ -43,7 +43,7 @@ registers it with the running shell, and places the bar indicator for you
 If you'd rather install manually (e.g. for local development):
 
 ```bash
-git clone https://github.com/toha82-tech/touchtype.git ~/.config/omarchy/plugins/touchtype
+git clone https://github.com/anatonius/touchtype.git ~/.config/omarchy/plugins/touchtype
 omarchy plugin enable touchtype --section right
 ```
 
