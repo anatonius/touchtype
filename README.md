@@ -110,6 +110,18 @@ rm -f ~/.local/state/omarchy/touchtype-progress.json
 
 MIT — see [LICENSE](LICENSE).
 
+## Tests
+
+The pure scripts the shell and the tests share — `Corpus.js`,
+`Curriculum.js` and `ProgressStore.js` — are covered by a Node test suite:
+
+```bash
+npm test
+```
+
+The suite runs in CI on every push and pull request, so a pull request shows
+whether it is green before anyone reads the diff.
+
 ## Development notes
 
 - Validated with `qmllint` (only the standard false-positive categories that
